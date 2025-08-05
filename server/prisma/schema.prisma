@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String      @id @default(cuid())
+  email      String      @unique
+  password   String      
+  name       String
+  isVerified Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime?   @updatedAt
+  boards     Board[]
+  meta       UserMeta[]
+  media      Media[]
+  lists      List[]      @relation("UserLists")
+  cards      Card[]      @relation("UserCards")
+}
+
+model UserMeta {
+  id        String   @id @default(cuid())
+  key       String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@unique([userId, key])
+}
+
+model Board {
+  id        String     @id @default(cuid())
+  title     String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  position  Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  lists     List[]
+  meta      BoardMeta[]
+}
+
+model BoardMeta {
+  id        String   @id @default(cuid())
+  key       String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  boardId   String
+}
+
+model List {
+  id        String   @id @default(cuid())
+  title     String
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  boardId   String
+
+  user      User?    @relation("UserLists", fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
+
+  cards     Card[]
+  meta      ListMeta[]
+}
+
+model ListMeta {
+  id        String   @id @default(cuid())
+  key       String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  list      List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  listId    String
+}
+
+model Card {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  list      List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  listId    String
+
+  user      User?    @relation("UserCards", fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
+
+  meta      CardMeta[]
+}
+
+model CardMeta {
+  id        String   @id @default(cuid())
+  key       String
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  card      Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  cardId    String
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  url       String
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
