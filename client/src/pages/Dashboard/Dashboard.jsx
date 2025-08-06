@@ -40,19 +40,18 @@ export default function DashboardPage() {
       }
     }
 
-    fetchStats()
-    const fetchUser = async () => {
+    const refreshToken = async () => {
       try {
         const res = await fetchWithAuth('/auth/refresh')
         const data = await res.json()
-        setUser(data.user)
+        setAccessToken(data.accessToken) // or however you store it
       } catch (err) {
-        console.error('Error fetching user info:', err)
+        console.error('Error refreshing access token:', err)
       }
     }
 
-    fetchUser()
-
+    refreshToken()
+    fetchStats()
   }, [])
 
   if (loading) {
