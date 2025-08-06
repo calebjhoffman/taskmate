@@ -24,4 +24,4 @@ context = "."
 
 [mounts]
   source = "uploads"
-  destination = "/app/uploads"
+  destination = "/app/server/uploads"

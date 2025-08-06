@@ -32,20 +32,23 @@ export const AuthProvider = ({ children }) => {
       const meta = data.meta || {}
       console.log(meta)
       // If meta.avatar exists, fetch the media record
-      if (meta.avatar) {
-        try {
-          const mediaRes = await fetch(`${API}/media/${meta.avatar}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            credentials: 'include',
-          })
-          const mediaData = await mediaRes.json()
-          meta.avatarUrl = `${API.replace('/api', '')}${mediaData.url}`
-        } catch (err) {
-          console.warn('⚠️ Failed to fetch media for avatar', err)
-        }
+    if (meta.avatar) {
+      try {
+        const mediaRes = await fetch(`${API}/media/${meta.avatar}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: 'include',
+        })
+        const mediaData = await mediaRes.json()
+
+        const serverUrl = import.meta.env.VITE_SERVER_PUBLIC_URL
+        const path = mediaData.url?.startsWith('/') ? mediaData.url : `/${mediaData.url}`
+        meta.avatarUrl = `${serverUrl}${path}`
+      } catch (err) {
+        console.warn('⚠️ Failed to fetch media for avatar', err)
       }
+    }
 
       setMeta(meta)
     } catch (err) {
