@@ -24,10 +24,12 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const fetchWithAuth = useFetchWithAuth()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, accessToken } = useAuth()
 
 
   useEffect(() => {
+    if (!accessToken || !user) return
+
     const fetchStats = async () => {
       try {
         const res = await fetchWithAuth('/dashboard/summary')
@@ -40,19 +42,8 @@ export default function DashboardPage() {
       }
     }
 
-    const refreshToken = async () => {
-      try {
-        const res = await fetchWithAuth('/auth/refresh')
-        const data = await res.json()
-        setAccessToken(data.accessToken) // or however you store it
-      } catch (err) {
-        console.error('Error refreshing access token:', err)
-      }
-    }
-
-    refreshToken()
     fetchStats()
-  }, [])
+  }, [accessToken, user])
 
   if (loading) {
     return (
