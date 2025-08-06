@@ -43,7 +43,7 @@ export default function DashboardPage() {
     fetchStats()
     const fetchUser = async () => {
       try {
-        const res = await fetchWithAuth('/auth/meta')
+        const res = await fetchWithAuth('/auth/refresh')
         const data = await res.json()
         setUser(data.user)
       } catch (err) {

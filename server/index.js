@@ -17,9 +17,20 @@ import dashboardRoutes from './routes/dashboard.js'
 dotenv.config()
 const app = express()
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://taskmate.calebhoffman.com',
+]
 
 app.use(cors({
-  origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      console.warn(`❌ Blocked CORS request from origin: ${origin}`)
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   credentials: true,
 }))
 app.use(express.json())

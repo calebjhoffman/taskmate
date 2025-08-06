@@ -1,0 +1,22 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy only package files
+COPY package*.json ./
+RUN npm install
+
+RUN apk add --no-cache netcat-openbsd
+
+# Copy the rest of the server code
+COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Add entrypoint script
+
+RUN chmod +x docker-entrypoint.prod.sh
+
+EXPOSE 3000
+CMD ["sh", "./docker-entrypoint.prod.sh"]
